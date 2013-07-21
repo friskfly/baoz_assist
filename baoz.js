@@ -9,8 +9,8 @@
 			while (srcElement && srcElement.tagName.toLowerCase() != "a" && srcElement.tagName.toLowerCase() != "ul") srcElement = srcElement.parentElement
 			if (srcElement && srcElement.tagName.toLowerCase() == "a") {
 				var href = srcElement.getAttribute("href")
-				var tid = /(\d+)/.exec(href)
-				tid = tid && tid[0]
+				var tid = /\/(\d+)$/.exec(href)
+				tid = tid && tid[1]
 				tid && setTimeout(function() {
 					var tidScroll = baoz_assist_storage[tid]
 					tidScroll && _scrollTo(tidScroll)
@@ -50,10 +50,13 @@
 			content = document.querySelectorAll(".content")
 			scrollRole = content.item(content.length - 1).querySelector(".view_body div");
 		//scrollRole = document.querySelector(".content[style='top: 0px;'] .view_body div"),  这种选择器能工作但不太靠谱
+		scrollRole.addEventListener('DOMNodeInserted', _debounce(function(e) {
+			__scrollTo()
+		}, 300), false);
 
 		function __scrollTo() {
+			var scrollHeight = scrollRole.scrollHeight - scrollRole.clientHeight
 			scrollRole.scrollTop = scroll
-			scrollHeight = scrollRole.scrollHeight - scrollRole.clientHeight
 			scroll += i
 			i += 100
 			if (scrollHeight >= x) {
@@ -63,7 +66,6 @@
 				if (scroll < scrollHeight) setTimeout(__scrollTo, 100)
 				else {
 					scrollRole.scrollTop = scrollHeight
-					setTimeout(__scrollTo, 200)
 				}
 			}
 		}
