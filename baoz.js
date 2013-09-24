@@ -1,5 +1,6 @@
 (function() {
 	var prefix = 'baoz_assist'
+	var stop = false
 	baoz_assist_storage = localStorage.getItem(prefix)
 	if (!baoz_assist_storage) baoz_assist_storage = "{}"
 	baoz_assist_storage = JSON.parse(baoz_assist_storage)
@@ -8,6 +9,7 @@
 			var srcElement = e.target || e.srcElement
 			while (srcElement && srcElement.tagName.toLowerCase() != "a" && srcElement.tagName.toLowerCase() != "ul") srcElement = srcElement.parentElement
 			if (srcElement && srcElement.tagName.toLowerCase() == "a") {
+				stop = false
 				var href = srcElement.getAttribute("href")
 				var tid = /\/(\d+)$/.exec(href)
 				tid = tid && tid[1]
@@ -19,11 +21,12 @@
 					var content = document.querySelectorAll(".content")
 					scrollRole = content.item(content.length - 1).querySelector(".view_body div");
 					scrollRole.addEventListener('mousewheel', _debounce(function(e) {
+						stop = true
 						baoz_assist_storage[tid] = this.scrollTop
 						localStorage.setItem(prefix, JSON.stringify(baoz_assist_storage))
 					}, 300), false)
 				}, 1000)
-			}
+			} else stop = true
 		}, 1000)
 	}, false)
 
@@ -55,6 +58,7 @@
 		}, 300), false);
 
 		function __scrollTo() {
+			if (stop) return
 			var scrollHeight = scrollRole.scrollHeight - scrollRole.clientHeight
 			scrollRole.scrollTop = scroll
 			scroll += i
